@@ -37,7 +37,7 @@ jobs:
         run: ssh prod 'cd flok && git fetch && git reset --hard ${{ github.sha }} && npm install'
 
       - name: Sync web build
-        uses: burnett01/rsync-deployments@7.0.0
+        uses: https://github.com/Burnett01/rsync-deployments.git@7.0.0
         with:
           switches: -avzr --delete
           path: packages/web/dist/
