@@ -34,7 +34,7 @@ export const Pane = ({
     />
     {children}
     <EvaluateButton
-      className="absolute z-10 right-4 top-6 sm:hidden"
+      className="absolute z-10 right-4 top-6 md:hidden"
       onClick={() => onEvaluateButtonClick(document)}
     />
   </div>
