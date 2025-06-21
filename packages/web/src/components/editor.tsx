@@ -17,6 +17,7 @@ import {
   panicCodes as panicCodesUntyped,
   targetsWithDocumentEvalMode,
   noAutoIndent,
+  noLineEval,
   webTargets,
 } from "@/settings.json";
 import { javascript } from "@codemirror/lang-javascript";
@@ -111,7 +112,13 @@ const flokSetup = (
   return [
     flashField(),
     remoteEvalFlash(doc),
-    Prec.high(evalKeymap(doc, { defaultMode, web })),
+    Prec.high(
+      evalKeymap(doc, {
+        defaultMode,
+        web,
+        lineEvalKeys: noLineEval ? [] : ["Shift-Enter"],
+      }),
+    ),
     panicKeymap(doc),
     extraKeymap(),
     autoIndentKeymap(doc),
