@@ -1,6 +1,6 @@
 import { DisplaySettings } from "./display-settings.ts";
 import { ErrorHandler } from "./types.ts";
-import { isWebglSupported } from "./webgl-detector.ts";
+import { isWebglSupported } from "./utils.js";
 
 declare global {
   interface Window {

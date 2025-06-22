@@ -1,11 +1,10 @@
+import PunctualCanvas from "@/components/punctual-canvas";
 import { useEvalHandler } from "@/hooks/use-eval-handler";
 import { useSettings } from "@/hooks/use-settings";
-import { sendToast } from "@/lib/utils";
-import { isWebglSupported } from "@/lib/webgl-detector";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { defaultDisplaySettings } from "@/lib/display-settings";
 import { PunctualWrapper } from "@/lib/punctual-wrapper";
-import PunctualCanvas from "@/components/punctual-canvas";
+import { isWebglSupported, sendToast } from "@/lib/utils";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 declare global {
   interface Window {

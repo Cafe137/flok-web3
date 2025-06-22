@@ -2,11 +2,10 @@ import HydraCanvas from "@/components/hydra-canvas";
 import { useAnimationFrame } from "@/hooks/use-animation-frame";
 import { useEvalHandler } from "@/hooks/use-eval-handler";
 import { useSettings } from "@/hooks/use-settings";
-import { HydraWrapper } from "@/lib/hydra-wrapper";
-import { sendToast } from "@/lib/utils";
-import { isWebglSupported } from "@/lib/webgl-detector";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { defaultDisplaySettings } from "@/lib/display-settings";
+import { HydraWrapper } from "@/lib/hydra-wrapper";
+import { isWebglSupported, sendToast } from "@/lib/utils";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 declare global {
   interface Window {

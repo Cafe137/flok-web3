@@ -5,6 +5,7 @@ import { Editor, EditorSettings } from "@/components/editor";
 import { MessagesPanel } from "@/components/messages-panel";
 import { Mosaic } from "@/components/mosaic";
 import { Pane } from "@/components/pane";
+import { isMobilePhone } from "@/lib/utils";
 import { ReplsButton } from "@/components/repls-button";
 import { ReplsDialog } from "@/components/repls-dialog";
 import SessionCommandDialog from "@/components/session-command-dialog";
@@ -85,6 +86,11 @@ export async function loader({ params }: LoaderFunctionArgs) {
 export function Component() {
   const query = useQuery();
   const [hash, setHash] = useHash();
+
+  const [currentPaneIndex, setCurrentPaneIndex] = useState(0);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  const isMobile = useMemo(() => isMobilePhone(), []);
 
   const { name } = useLoaderData() as SessionLoaderParams;
   const navigate = useNavigate();
@@ -563,6 +569,33 @@ export function Component() {
     [documents],
   );
 
+  useEffect(() => {
+    const viewport = window.visualViewport;
+    if (!viewport) return;
+
+    const handleViewportChange = () => {
+      const keyboardHeight = window.innerHeight - viewport.height;
+      setKeyboardHeight(keyboardHeight > 0 ? keyboardHeight : 0);
+    };
+
+    viewport.addEventListener("resize", handleViewportChange);
+    return () => {
+      viewport.removeEventListener("resize", handleViewportChange);
+    };
+  }, []);
+
+  const handleNextPane = () => {
+    if (currentPaneIndex < documents.length - 1) {
+      setCurrentPaneIndex(currentPaneIndex + 1);
+    }
+  };
+
+  const handlePreviousPane = () => {
+    if (currentPaneIndex > 0) {
+      setCurrentPaneIndex(currentPaneIndex - 1);
+    }
+  };
+
   return (
     <div style={{ backgroundColor: `rgb(0 0 0 / ${bgOpacity})` }}>
       <Helmet>
@@ -634,12 +667,14 @@ export function Component() {
           "transition-opacity",
           hidden ? "opacity-0" : "opacity-100",
         )}
+        currentPaneIndex={currentPaneIndex}
         items={documents.map((doc, i) => (
           <Pane
             key={doc.id}
             document={doc}
             onTargetChange={handleTargetSelectChange}
             onEvaluateButtonClick={handleEvaluateButtonClick}
+            onCommandsButtonClick={() => setCommandsDialogOpen(true)}
           >
             <Editor
               ref={editorRefs[i]}
@@ -659,18 +694,20 @@ export function Component() {
           displaySettings={displaySettings}
         />
       ))}
-      <div
-        className={cn(
-          "fixed top-1 right-1 flex m-1",
-          "transition-opacity",
-          hidden ? "opacity-0" : "opacity-100",
-        )}
-      >
-        {replTargets.length > 0 && (
-          <ReplsButton onClick={() => setReplsDialogOpen(true)} />
-        )}
-        <CommandsButton onClick={() => setCommandsDialogOpen(true)} />
-      </div>
+      {!isMobile && (
+        <div
+          className={cn(
+            "fixed top-1 right-1 flex m-1",
+            "transition-opacity",
+            hidden ? "opacity-0" : "opacity-100",
+          )}
+        >
+          {replTargets.length > 0 && (
+            <ReplsButton onClick={() => setReplsDialogOpen(true)} />
+          )}
+          <CommandsButton onClick={() => setCommandsDialogOpen(true)} />
+        </div>
+      )}
       {messagesPanelExpanded && (
         <MessagesPanel
           className={cn(
@@ -696,6 +733,11 @@ export function Component() {
         onExpandClick={() => {
           setMessagesPanelExpanded((v) => !v);
         }}
+        currentPaneIndex={currentPaneIndex}
+        totalPanes={documents.length}
+        onNextPane={handleNextPane}
+        onPreviousPane={handlePreviousPane}
+        keyboardHeight={keyboardHeight}
       />
       <Toaster />
     </div>
