@@ -1,25 +1,15 @@
-import "../assets/fonts/IBM Plex Mono/stylesheet.css";
-import "../assets/fonts/BigBlue/stylesheet.css";
-import "../assets/fonts/Monocraft/stylesheet.css";
-import "../assets/fonts/JetBrains/stylesheet.css";
-import "../assets/fonts/JGS/stylesheet.css";
-import "../assets/fonts/StepsMono/stylesheet.css";
-import "../assets/fonts/FiraCode/stylesheet.css";
-import "../assets/fonts/SyneMono/stylesheet.css";
-import "../assets/fonts/VT323/stylesheet.css";
-import "../assets/fonts/RobotoMono/stylesheet.css";
-import "../assets/fonts/UbuntuMono/stylesheet.css";
-import "../assets/fonts/OpenDyslexic/stylesheet.css";
-
 import { useQuery } from "@/hooks/use-query";
+import { loadFont } from "@/lib/fonts";
+import themes from "@/lib/themes";
 import {
   langByTarget as langByTargetUntyped,
-  panicCodes as panicCodesUntyped,
-  targetsWithDocumentEvalMode,
   noAutoIndent,
   noLineEval,
+  panicCodes as panicCodesUntyped,
+  targetsWithDocumentEvalMode,
   webTargets,
 } from "@/settings.json";
+import { insertNewline, toggleLineComment } from "@codemirror/commands";
 import { javascript } from "@codemirror/lang-javascript";
 import { python } from "@codemirror/lang-python";
 import { EditorState, Prec } from "@codemirror/state";
@@ -29,20 +19,18 @@ import {
   lineNumbers as lineNumbersExtension,
 } from "@codemirror/view";
 import { evalKeymap, flashField, remoteEvalFlash } from "@flok-editor/cm-eval";
-import { tidal } from "@flok-editor/lang-tidal";
 import { punctual } from "@flok-editor/lang-punctual";
+import { tidal } from "@flok-editor/lang-tidal";
 import type { Document } from "@flok-editor/session";
+import { vim } from "@replit/codemirror-vim";
 import { highlightExtension } from "@strudel/codemirror";
 import CodeMirror, {
   ReactCodeMirrorProps,
   ReactCodeMirrorRef,
 } from "@uiw/react-codemirror";
-import { vim } from "@replit/codemirror-vim";
 import React, { useEffect, useState } from "react";
 import { yCollab } from "y-codemirror.next";
 import { UndoManager } from "yjs";
-import themes from "@/lib/themes";
-import { toggleLineComment, insertNewline } from "@codemirror/commands";
 
 const defaultLanguage = "javascript";
 const langByTarget = langByTargetUntyped as { [lang: string]: string };
@@ -147,18 +135,8 @@ export interface EditorProps extends ReactCodeMirrorProps {
 
 export const Editor = ({ document, settings, ref, ...props }: EditorProps) => {
   const [mounted, setMounted] = useState(false);
+  const [fontLoaded, setFontLoaded] = useState(false);
   const query = useQuery();
-
-  // useEffect only runs on the client, so now we can safely show the UI
-  useEffect(() => {
-    // Make sure query parameters are set before loading the editor
-    if (!query) return;
-    setMounted(true);
-  }, [query]);
-
-  if (!mounted || !document) {
-    return null;
-  }
 
   const { theme, fontFamily, lineNumbers, wrapText, vimMode } = {
     theme: "dracula",
@@ -168,6 +146,41 @@ export const Editor = ({ document, settings, ref, ...props }: EditorProps) => {
     vimMode: false,
     ...settings,
   };
+
+  // Load the current font
+  useEffect(() => {
+    if (!fontFamily) return;
+
+    let isCancelled = false;
+
+    const loadCurrentFont = async () => {
+      await loadFont(fontFamily);
+      if (!isCancelled) {
+        setFontLoaded(true);
+      }
+    };
+
+    loadCurrentFont();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [fontFamily]);
+
+  // useEffect only runs on the client, so now we can safely show the UI
+  useEffect(() => {
+    // Make sure query parameters are set before loading the editor
+    if (!query) return;
+    setMounted(true);
+  }, [query]);
+
+  if (!mounted || !document || !fontLoaded) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-sm text-gray-500">Loading editor...</div>
+      </div>
+    );
+  }
 
   const readOnly = !!query.get("readOnly");
   const language: string = langByTarget[document.target] || defaultLanguage;

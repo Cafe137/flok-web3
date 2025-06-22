@@ -1,6 +1,4 @@
-import { Mercury } from "mercury-engine";
-
-export type ErrorHandler = (error: string) => void;
+import { ErrorHandler } from "./types.js";
 
 export class MercuryWrapper {
   initialized: boolean = false;
@@ -25,6 +23,10 @@ export class MercuryWrapper {
     if (this.initialized) {
       return;
     }
+
+    const { Mercury } = await import("mercury-engine").then(
+      (module) => module.default || module,
+    );
 
     // set initialized to true only when samples are loaded
     this._repl = new Mercury({

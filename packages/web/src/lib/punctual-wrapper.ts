@@ -1,5 +1,5 @@
 import { DisplaySettings } from "./display-settings.js";
-import { ErrorHandler } from "./mercury-wrapper.js";
+import { ErrorHandler } from "./types.js";
 import { isWebglSupported } from "./webgl-detector.js";
 
 // Based on https://github.com/dktr0/Punctual/blob/main/index.html

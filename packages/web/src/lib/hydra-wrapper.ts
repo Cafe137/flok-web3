@@ -1,6 +1,6 @@
-import Hydra from "hydra-synth";
-import { isWebglSupported } from "@/lib/webgl-detector.js";
-import { DisplaySettings } from "@/lib/display-settings.ts";
+import { DisplaySettings } from "./display-settings.ts";
+import { ErrorHandler } from "./types.ts";
+import { isWebglSupported } from "./webgl-detector.ts";
 
 declare global {
   interface Window {
@@ -13,8 +13,6 @@ declare global {
     useStrudelCanvas: Function;
   }
 }
-
-type ErrorHandler = (err: string) => void;
 
 export class HydraWrapper {
   initialized: boolean = false;
@@ -61,6 +59,9 @@ export class HydraWrapper {
       );
     }
 
+    const Hydra = await import("hydra-synth").then(
+      (module) => module.default || module,
+    );
     const { P5Wrapper } = await import("./p5-wrapper.js");
 
     window.P5 = P5Wrapper;

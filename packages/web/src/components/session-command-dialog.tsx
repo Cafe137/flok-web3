@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Command,
   CommandDialog,
   CommandDialogProps,
   CommandEmpty,
@@ -8,33 +9,32 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-  Command,
   CommandSeparator,
   CommandShortcut,
 } from "@/components/ui/command";
-import { changeLogUrl, repoUrl } from "@/settings.json";
+import { DisplaySettings } from "@/lib/display-settings";
+import fonts, { loadFont } from "@/lib/fonts";
 import themes from "@/lib/themes";
-import fonts from "@/lib/fonts";
+import { changeLogUrl, repoUrl } from "@/settings.json";
 import {
-  Edit2,
-  FilePlus,
-  TextCursorIcon,
-  WrapText,
   ArrowLeft,
-  Github,
+  Edit2,
   FileDigit,
-  Type,
+  FilePlus,
+  Github,
   Minus,
-  Plus,
+  Monitor,
   Palette,
+  Plus,
   Settings,
   Share,
-  Monitor,
+  TextCursorIcon,
+  Type,
+  WrapText,
 } from "lucide-react";
-import { Link } from "react-router-dom";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { EditorSettings } from "./editor";
-import { DisplaySettings } from "@/lib/display-settings";
 
 interface SessionCommandDialogProps extends CommandDialogProps {
   editorSettings: EditorSettings;
@@ -59,6 +59,8 @@ export default function SessionCommandDialog({
   const { fontFamily, theme, vimMode, lineNumbers, wrapText } = editorSettings;
 
   const [pages, setPages] = useState<string[]>([]);
+  const [fontsLoaded, setFontsLoaded] = useState(false);
+  const [loadingFonts, setLoadingFonts] = useState(false);
 
   const wrapHandler = (callback: () => void) => {
     return () => {
@@ -76,6 +78,25 @@ export default function SessionCommandDialog({
     };
   };
 
+  const loadAllFonts = async () => {
+    if (fontsLoaded || loadingFonts) return;
+
+    setLoadingFonts(true);
+    try {
+      await Promise.all(fonts.map((font) => loadFont(font)));
+      setFontsLoaded(true);
+    } catch (error) {
+      console.warn("Failed to load some fonts:", error);
+    } finally {
+      setLoadingFonts(false);
+    }
+  };
+
+  const handleFontsMenuSelect = async () => {
+    setPages([...pages, "fonts"]);
+    await loadAllFonts();
+  };
+
   const fontSelection = (font: string) => {
     setPages([]);
     wrapHandler(() =>
@@ -84,6 +105,13 @@ export default function SessionCommandDialog({
         fontFamily: font,
       }),
     )();
+  };
+
+  const handleFontHover = (font: string) => {
+    onEditorSettingsChange({
+      ...editorSettings,
+      fontFamily: font,
+    });
   };
 
   const themeSelection = (theme: string) => {
@@ -153,7 +181,7 @@ export default function SessionCommandDialog({
             <CommandSeparator />
             <CommandGroup heading="Editor">
               <CommandList className="ml-2">
-                <CommandItem onSelect={() => setPages([...pages, "fonts"])}>
+                <CommandItem onSelect={handleFontsMenuSelect}>
                   <Type className="mr-2 h-4 w-4 inline" />
                   <span>
                     Change Font Family: <b>{fontFamily}</b>
@@ -242,27 +270,25 @@ export default function SessionCommandDialog({
               <ArrowLeft className="mr-2 h-4 w-4" />
               <span>Back to menu</span>
             </CommandItem>
-            {Object.entries(fonts).map(([fontKey, fontValue]) => (
-              <CommandItem
-                onMouseEnter={() =>
-                  onEditorSettingsChange({
-                    ...editorSettings,
-                    fontFamily: fontValue,
-                  })
-                }
-                onSelect={wrapHandlerWithValue(fontSelection, fontValue)}
-                key={fontKey}
-              >
-                <Palette className="mr-2 h-4 w-4" />
-                <span className="capitalize" style={{ fontFamily: fontValue }}>
-                  {fontKey}
-                </span>
+            {loadingFonts ? (
+              <CommandItem disabled>
+                <span>Loading fonts...</span>
               </CommandItem>
-            ))}
+            ) : (
+              fonts.map((font) => (
+                <CommandItem
+                  onMouseEnter={() => handleFontHover(font)}
+                  onSelect={() => fontSelection(font)}
+                  key={font}
+                >
+                  <Type className="mr-2 h-4 w-4" />
+                  <span style={{ fontFamily: font }}>{font}</span>
+                </CommandItem>
+              ))
+            )}
           </CommandGroup>
         )}
         {page === "themes" && (
-          // <CommandList className="ml-2">
           <CommandGroup heading="Themes">
             <CommandItem onSelect={() => setPages([])} key="themeMenu">
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -280,7 +306,6 @@ export default function SessionCommandDialog({
                 <span className="capitalize">{name}</span>
               </CommandItem>
             ))}
-            {/* </CommandList> */}
           </CommandGroup>
         )}
       </CommandList>

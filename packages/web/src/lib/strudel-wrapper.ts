@@ -18,9 +18,8 @@ import {
   samples,
   webaudioOutput,
 } from "@strudel/webaudio";
+import { ErrorHandler } from "./types.ts";
 import { updateDocumentsContext } from "./utils";
-
-export type ErrorHandler = (error: string) => void;
 
 controls.createParam("docId");
 
