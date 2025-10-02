@@ -15,8 +15,10 @@ import {
   getAudioContext,
   initAudio,
   registerSynthSounds,
+  registerZZFXSounds,
   samples,
   webaudioOutput,
+  aliasBank,
 } from "@strudel/webaudio";
 import { ErrorHandler } from "./types.ts";
 import { updateDocumentsContext } from "./utils";
@@ -88,6 +90,7 @@ export class StrudelWrapper {
         loadSamples(),
         registerSynthSounds(),
         registerSoundfonts(),
+        registerZZFXSounds(),
       ]);
     } catch (err) {
       this._onWarning(`Failed to load default samples EmuSP12: ${err}`);
@@ -191,13 +194,16 @@ export class StrudelWrapper {
 
 async function loadSamples() {
   const ds = "https://raw.githubusercontent.com/felixroos/dough-samples/main/";
-  return Promise.all([
+  const result = await Promise.all([
     samples(`${ds}/tidal-drum-machines.json`),
     samples(`${ds}/piano.json`),
     samples(`${ds}/Dirt-Samples.json`),
     samples(`${ds}/EmuSP12.json`),
     samples(`${ds}/vcsl.json`),
+    samples(`${ds}/mridangam.json`),
   ]);
+  aliasBank("https://raw.githubusercontent.com/todepond/samples/main/tidal-drum-machines-alias.json");
+  return result;
 }
 
 // this is a little bit awkward but the piano function has to be duplicated here..
