@@ -8,5 +8,10 @@ export default {
     { file: "dist/index.cjs", format: "cjs" },
     { dir: "./dist", format: "es" },
   ],
-  plugins: [lezer(), typescript()],
+  plugins: [
+    lezer(),
+    typescript({
+      transpileOnly: true,
+    }),
+  ],
 };
