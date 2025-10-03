@@ -33,6 +33,7 @@ export class StrudelWrapper {
   protected _repl: any;
   protected _docPatterns: any;
   protected _audioInitialized: boolean;
+  protected _evalAsMondo: boolean = false;
   protected framer?: any;
   protected mini?: any;
   protected core?: any;
@@ -56,14 +57,17 @@ export class StrudelWrapper {
   constructor({
     onError,
     onWarning,
+    evalAsMondo = false,
   }: {
     onError: ErrorHandler;
     onWarning: ErrorHandler;
+    evalAsMondo?: boolean;
   }) {
     this._docPatterns = {};
     this._onError = onError || (() => {});
     this._onWarning = onWarning || (() => {});
     this._audioInitialized = false;
+    this._evalAsMondo = evalAsMondo;
   }
 
   async importModules() {
@@ -181,10 +185,11 @@ export class StrudelWrapper {
     if (!this.initialized) await this.initialize();
     try {
       const { body: code, docId } = msg;
+      const evalCode = this._evalAsMondo ? `mondo\`${code}\`` : code;
       // little hack that injects the docId at the end of the code to make it available in afterEval
       // also add ann analyser node to all patterns, for fft data in hydra
       const pattern = await this._repl.evaluate(
-        `${code}\n${this.enableAutoAnalyze ? this.hapAnalyzeSnippet : ""}\n//${docId}`,
+        `${evalCode}\n${this.enableAutoAnalyze ? this.hapAnalyzeSnippet : ""}\n//${docId}`,
       );
       if (pattern) {
         this._docPatterns[docId] = pattern.docId(docId); // docId is needed for highlighting
@@ -208,7 +213,9 @@ async function loadSamples() {
     samples(`${ds}/vcsl.json`),
     samples(`${ds}/mridangam.json`),
   ]);
-  aliasBank("https://raw.githubusercontent.com/todepond/samples/main/tidal-drum-machines-alias.json");
+  aliasBank(
+    "https://raw.githubusercontent.com/todepond/samples/main/tidal-drum-machines-alias.json",
+  );
   return result;
 }
 

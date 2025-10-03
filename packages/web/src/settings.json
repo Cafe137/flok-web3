@@ -9,6 +9,7 @@
     "sardine",
     "sclang",
     "strudel",
+    "mondo-strudel",
     "tidal",
     "dummy"
   ],
@@ -23,6 +24,7 @@
     "sardine": "python",
     "sclang": "javascript",
     "strudel": "javascript",
+    "mondo-strudel": "tidal",
     "tidal": "tidal",
     "dummy": "none"
   },
@@ -30,7 +32,8 @@
     "mercury-web",
     "mercury",
     "punctual",
-    "strudel"
+    "strudel",
+    "mondo-strudel"
   ],
   "panicCodes": {
     "tidal": "hush",
@@ -42,12 +45,19 @@
     "mercury-web": "silence",
     "hydra": "hush()",
     "strudel": "silence",
+    "mondo-strudel": "hush",
     "sardine": "panic()",
     "dummy": "silence"
   },
   "noAutoIndent": ["mercury", "mercury-web"],
   "noLineEval": ["mercury", "mercury-web"],
-  "webTargets": ["hydra", "mercury-web", "punctual", "strudel"],
+  "webTargets": [
+    "hydra",
+    "mercury-web",
+    "punctual",
+    "strudel",
+    "mondo-strudel"
+  ],
   "repoUrl": "https://github.com/munshkr/flok",
   "changeLogUrl": "https://github.com/munshkr/flok/blob/main/CHANGELOG.md#changelog"
 }
