@@ -38,10 +38,12 @@ export class StrudelWrapper {
   protected core?: any;
   protected draw?: any;
   protected webaudio?: any;
+  protected codemirror?: any;
+  protected mondo?: any;
 
   enableAutoAnalyze = false;
   hapAnalyzeSnippet = `
-    all(x => 
+    all(x =>
       x.fmap(hap => {
         if(hap.analyze == undefined) {
           hap.analyze = 'flok-master';
@@ -70,6 +72,8 @@ export class StrudelWrapper {
     this.mini = await import("@strudel/mini");
     this.core = await import("@strudel/core");
     this.draw = await import("@strudel/draw");
+    this.codemirror = await import("@strudel/codemirror");
+    this.mondo = await import("@strudel/mondo");
 
     this.webaudio = await import("@strudel/webaudio");
 
@@ -83,6 +87,8 @@ export class StrudelWrapper {
       import("@strudel/serial"),
       import("@strudel/soundfonts"),
       this.webaudio,
+      this.codemirror,
+      this.mondo,
       controls,
     );
     try {
