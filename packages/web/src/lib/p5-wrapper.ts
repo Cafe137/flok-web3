@@ -25,8 +25,6 @@ export class P5Wrapper extends p5 {
       p.draw = () => {};
     });
 
-    this.width = w;
-    this.height = h;
     this.mode = m;
 
     this.canvas = canvas;
