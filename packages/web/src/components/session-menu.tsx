@@ -78,7 +78,7 @@ export default function SessionMenu({
             <MenubarItem>Show Release Notes</MenubarItem>
           </Link>
           <Link to={repoUrl} reloadDocument target="_blank">
-            <MenubarItem>Go to GitHub</MenubarItem>
+            <MenubarItem>Go to Codeberg</MenubarItem>
           </Link>
         </MenubarContent>
       </MenubarMenu>
