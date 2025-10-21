@@ -1,5 +1,5 @@
-declare module '@strudel/mondo' {
-  import { Pattern } from '@strudel/core';
+declare module "@strudel/mondo" {
+  import { Pattern } from "@strudel/core";
 
   /**
    * Tagged template function for Mondo Language syntax.
@@ -9,7 +9,10 @@ declare module '@strudel/mondo' {
    * mondo`s hh*8`
    * mondo`note [c e g]*4`
    */
-  export function mondo(code: string | TemplateStringsArray, offset?: number): Pattern;
+  export function mondo(
+    code: string | TemplateStringsArray,
+    offset?: number,
+  ): Pattern;
 
   /**
    * Similar to mondo, but with zero offset.
@@ -32,5 +35,8 @@ declare module '@strudel/mondo' {
    * @param offset - Starting offset in the source file
    * @returns Array of location tuples [start, end]
    */
-  export function getLocations(code: string, offset: number): [number, number][];
+  export function getLocations(
+    code: string,
+    offset: number,
+  ): [number, number][];
 }
