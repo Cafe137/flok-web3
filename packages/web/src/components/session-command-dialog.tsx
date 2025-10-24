@@ -21,7 +21,7 @@ import {
   Edit2,
   FileDigit,
   FilePlus,
-  Github,
+  FolderGit2,
   Minus,
   Monitor,
   Palette,
@@ -257,8 +257,8 @@ export default function SessionCommandDialog({
               </Link>
               <Link to={repoUrl} reloadDocument target="_blank">
                 <CommandItem>
-                  <Github className="mr-2 h-4 w-4" />
-                  <span>Go to GitHub</span>
+                  <FolderGit2 className="mr-2 h-4 w-4" />
+                  <span>Go to Repository</span>
                 </CommandItem>
               </Link>
             </CommandGroup>

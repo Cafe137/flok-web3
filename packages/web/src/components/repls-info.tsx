@@ -64,7 +64,7 @@ export function ReplsInfo({
       <p className="text-sm text-slate-500 dark:text-slate-400">
         For more information, read{" "}
         <Link
-          to="https://github.com/munshkr/flok#connect-repls-to-flok"
+          to="https://codeberg.org/munshkr/flok#connect-repls-to-flok"
           reloadDocument
           target="_blank"
         >

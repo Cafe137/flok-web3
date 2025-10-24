@@ -4,7 +4,7 @@
   "private": true,
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/munshkr/flok.git"
+    "url": "git+https://codeberg.org/munshkr/flok.git"
   },
   "scripts": {
     "build": "lerna run build",
@@ -22,9 +22,9 @@
   "author": "Damián Silvani <munshkr@gmail.com>",
   "license": "GPL-3.0+",
   "bugs": {
-    "url": "https://github.com/munshkr/flok/issues"
+    "url": "https://codeberg.org/munshkr/flok/issues"
   },
-  "homepage": "https://github.com/munshkr/flok#readme",
+  "homepage": "https://codeberg.org/munshkr/flok#readme",
   "devDependencies": {
     "lerna": "^6.5.1"
   },

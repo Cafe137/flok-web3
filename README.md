@@ -14,14 +14,14 @@ Web-based P2P collaborative editor for live coding music and graphics
   - [Renardo](https://renardo.org/)
   - [Mercury](#mercury)
   - [Sardine](https://sardine.raphaelforment.fr)
-  - [SonicPi](https://sonic-pi.net/) (_not implemented yet_, see [#29](https://github.com/munshkr/flok/issues/29))
+  - [SonicPi](https://sonic-pi.net/) (_not implemented yet_, see [#29](https://codeberg.org/munshkr/flok/issues/29))
   - ... any interpreter with a REPL (Python, Ruby, etc.)
 - Web Plugins, for languages embedded in editor:
   - [Hydra](https://github.com/ojack/hydra)
   - [p5.js](https://p5js.org/)
   - [Strudel](https://strudel.cc/)
   - [Mercury Web](https://www.timohoogland.com/mercury-livecoding/)
-  - [VEDA.js](https://github.com/fand/vedajs) (_not implemented yet_, see [#82](https://github.com/munshkr/flok/pull/82))
+  - [VEDA.js](https://github.com/fand/vedajs) (_not implemented yet_, see [#82](https://codeberg.org/munshkr/flok/pulls/82))
 
 ## Usage
 
@@ -505,7 +505,7 @@ the code.
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at the [issues
-page](https://github.com/munshkr/flok). This project is intended to be a safe,
+page](https://codeberg.org/munshkr/flok/issues). This project is intended to be a safe,
 welcoming space for collaboration, and contributors are expected to adhere to
 the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 

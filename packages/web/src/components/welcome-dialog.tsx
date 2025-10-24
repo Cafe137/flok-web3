@@ -38,7 +38,7 @@ export function WelcomeDialog({
             Read more{" "}
             <a
               className="text-gray-300 font-bold"
-              href="https://github.com/munshkr/flok"
+              href="https://codeberg.org/munshkr/flok"
               target="_blank"
             >
               here
