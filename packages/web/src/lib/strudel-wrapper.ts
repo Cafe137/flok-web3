@@ -204,7 +204,7 @@ export class StrudelWrapper {
 }
 
 async function loadSamples() {
-  const ds = "https://raw.githubusercontent.com/felixroos/dough-samples/main/";
+  const ds = "https://strudel.b-cdn.net";
   const result = await Promise.all([
     samples(`${ds}/tidal-drum-machines.json`),
     samples(`${ds}/piano.json`),
