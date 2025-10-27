@@ -213,9 +213,7 @@ async function loadSamples() {
     samples(`${ds}/vcsl.json`),
     samples(`${ds}/mridangam.json`),
   ]);
-  aliasBank(
-    "https://raw.githubusercontent.com/todepond/samples/main/tidal-drum-machines-alias.json",
-  );
+  aliasBank("/assets/tidal-drum-machines-alias.json");
   return result;
 }
 
