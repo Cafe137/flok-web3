@@ -47,6 +47,7 @@ import {
   useLoaderData,
   useNavigate,
 } from "react-router-dom";
+import { Textmodifier } from "textmode.js";
 
 declare global {
   interface Window {
@@ -55,6 +56,7 @@ declare global {
     mercury: any;
     strudel: any;
     punctual: any;
+    t: Textmodifier;
   }
 }
 

@@ -12,8 +12,8 @@ import "./style.css";
 const flokBasicSetup = (doc) => {
   const text = doc.getText();
   const undoManager = new UndoManager(text);
-  // if target is hydra, use "web" mode to evaluate on browser only, not REPLs
-  const web = doc.target === "hydra";
+  // if target is a web target, use "web" mode to evaluate on browser only, not REPLs
+  const web = ["hydra", "textmode"].includes(doc.target);
 
   return [
     flashField(),
@@ -63,12 +63,18 @@ const handleEvalHydra = (msg) => {
   // evaluate hydra code here...
 };
 
+const handleEvalTextmode = (msg) => {
+  console.log("eval:textmode", msg);
+  // evaluate textmode.js code here...
+};
+
 const session = new Session("default", { port: 3000 });
 window.session = session;
 
 session.on("change", (...args) => console.log("change", ...args));
 session.on("message", handleMessage);
 session.on("eval:hydra", handleEvalHydra);
+session.on("eval:textmode", handleEvalTextmode);
 
 session.on("sync", () => {
   // If session is empty, create two documents

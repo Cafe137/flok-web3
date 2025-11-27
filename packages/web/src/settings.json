@@ -10,6 +10,7 @@
     "sclang",
     "strudel",
     "mondo-strudel",
+    "textmode",
     "tidal",
     "dummy"
   ],
@@ -25,6 +26,7 @@
     "sclang": "javascript",
     "strudel": "javascript",
     "mondo-strudel": "javascript",
+    "textmode": "javascript",
     "tidal": "tidal",
     "dummy": "none"
   },
@@ -33,7 +35,8 @@
     "mercury",
     "punctual",
     "strudel",
-    "mondo-strudel"
+    "mondo-strudel",
+    "textmode"
   ],
   "panicCodes": {
     "tidal": "hush",
@@ -46,6 +49,7 @@
     "hydra": "hush()",
     "strudel": "silence",
     "mondo-strudel": "hush",
+    "textmode": "t.clear()",
     "sardine": "panic()",
     "dummy": "silence"
   },
@@ -56,7 +60,8 @@
     "mercury-web",
     "punctual",
     "strudel",
-    "mondo-strudel"
+    "mondo-strudel",
+    "textmode"
   ],
   "repoUrl": "https://codeberg.org/munshkr/flok",
   "changeLogUrl": "https://codeberg.org/munshkr/flok/src/branch/main/CHANGELOG.md"

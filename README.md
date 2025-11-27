@@ -21,6 +21,7 @@ Web-based P2P collaborative editor for live coding music and graphics
   - [p5.js](https://p5js.org/)
   - [Strudel](https://strudel.cc/)
   - [Mercury Web](https://www.timohoogland.com/mercury-livecoding/)
+  - [textmode.js](https://code.textmode.art)
   - [VEDA.js](https://github.com/fand/vedajs) (_not implemented yet_, see [#82](https://codeberg.org/munshkr/flok/pulls/82))
 
 ## Usage
@@ -331,6 +332,39 @@ solid(() => fft(0, 1), 0)
 **Caveat**: Because of how we setup the analyze node on Strudel, every Strudel pane
 needs a re-eval after the Hydra code decides that we need to get the fft data.
 This does not happen automatically, manual re-eval is necessary.
+
+#### textmode.js
+
+[textmode.js](https://code.textmode.art/) is a lightweight creative coding library for
+real-time ASCII and textmode graphics in the browser. It runs directly in the web app
+using WebGL2, so you don't need to install anything. Just use the `textmode` target
+to execute textmode.js code.
+
+The textmode.js instance is exposed globally as `t`, so you can use it directly in your
+code:
+
+```js
+t.draw(() => {
+  t.background(0);
+  
+  const halfCols = (t.grid.cols / 2) + 1;
+  const halfRows = (t.grid.rows / 2) + 1;
+  
+  for (let y = -halfRows; y < halfRows; y++) {
+    for (let x = -halfCols; x < halfCols; x++) {
+      const dist = Math.sqrt(x * x + y * y);
+      const wave = Math.sin(dist * 0.2 - t.frameCount * 0.15);
+      
+      t.push();
+      t.translate(x, y, 0);
+      t.char(wave > 0.5 ? '|' : wave > 0 ? '/' : '-');
+      t.charColor(0, 150 + wave * 100, 150 - wave * 100);
+      t.point();
+      t.pop();
+    }
+  }
+});
+```
 
 #### Mercury
 

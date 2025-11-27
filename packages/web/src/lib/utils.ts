@@ -133,6 +133,17 @@ export const isWebglSupported = () => {
   }
 };
 
+export const isWebgl2Supported = () => {
+  try {
+    const canvas = document.createElement("canvas");
+    return (
+      !!window.WebGL2RenderingContext && !!canvas.getContext("webgl2")
+    );
+  } catch (e) {
+    return false;
+  }
+};
+
 export const isTouchDevice = () => {
   if (typeof window === "undefined") return false;
   return "ontouchstart" in window || navigator.maxTouchPoints > 0;
