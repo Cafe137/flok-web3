@@ -8,7 +8,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 export function Component() {
   const hasWebGl2 = useMemo(() => isWebgl2Supported(), []);
   const [instance, setInstance] = useState<TextmodeWrapper | null>(null);
-  const [displaySettings, setDisplaySettings] = useState(defaultDisplaySettings);
+  const [displaySettings, setDisplaySettings] = useState(
+    defaultDisplaySettings,
+  );
 
   useEffect(() => {
     if (hasWebGl2) return;

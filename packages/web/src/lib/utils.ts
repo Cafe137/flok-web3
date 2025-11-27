@@ -136,9 +136,7 @@ export const isWebglSupported = () => {
 export const isWebgl2Supported = () => {
   try {
     const canvas = document.createElement("canvas");
-    return (
-      !!window.WebGL2RenderingContext && !!canvas.getContext("webgl2")
-    );
+    return !!window.WebGL2RenderingContext && !!canvas.getContext("webgl2");
   } catch (e) {
     return false;
   }

@@ -104,8 +104,12 @@ export class TextmodeWrapper {
         console.error("textmode.js draw error:", error);
         self._onError(`${error}`);
       },
-      get lastCallback() { return self._lastWorkingCallback; },
-      set lastCallback(cb) { self._lastWorkingCallback = cb; },
+      get lastCallback() {
+        return self._lastWorkingCallback;
+      },
+      set lastCallback(cb) {
+        self._lastWorkingCallback = cb;
+      },
     };
 
     try {
