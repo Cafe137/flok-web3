@@ -242,8 +242,8 @@ Use `flok-repl` with the `-t renardo` parameter.
 In the case of SuperCollider, there are two types of REPLs: `sclang` and
 `remote_sclang`. The first one tries to run a `sclang` process and interact
 with it, while the second one uses
-[FlokQuark](https://github.com/munshkr/FlokQuark) to communicate with SC. Read
-[more](https://github.com/munshkr/FlokQuark/blob/master/README.md) for
+[FlokQuark](https://codeberg.org/munshkr/FlokQuark) to communicate with SC. Read
+[more](https://codeberg.org/munshkr/FlokQuark/blob/master/README.md) for
 installing and using it.
 
 ##### `sclang` vs. `remote_sclang`
