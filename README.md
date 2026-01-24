@@ -20,7 +20,7 @@ Web-based P2P collaborative editor for live coding music and graphics
   - [Hydra](https://github.com/ojack/hydra)
   - [p5.js](https://p5js.org/)
   - [Strudel](https://strudel.cc/)
-  - [Mercury Web](https://www.timohoogland.com/mercury-livecoding/)
+  - [Mercury Web](https://mercury-playground.pages.dev/)
   - [textmode.js](https://code.textmode.art)
   - [VEDA.js](https://github.com/fand/vedajs) (_not implemented yet_, see [#82](https://codeberg.org/munshkr/flok/pulls/82))
 
@@ -333,6 +333,14 @@ solid(() => fft(0, 1), 0)
 needs a re-eval after the Hydra code decides that we need to get the fft data.
 This does not happen automatically, manual re-eval is necessary.
 
+##### Audio-reactivity from Mercury-Web with the `m` variable
+
+The `m` variable is a global variable that can be used for connecting the audio from Mercury to visuals in Hydra to create audio-reactivity. The amplitude of the total sound from `mercury-web` is stored in the variable `m`, this can be used as a parameter with the arrow function:
+
+```js
+osc(10, 0, () => m * 4 ).out()
+```
+
 #### textmode.js
 
 [textmode.js](https://code.textmode.art/) is a lightweight creative coding library for
@@ -368,12 +376,13 @@ t.draw(() => {
 
 #### Mercury
 
-[Mercury](https://github.com/tmhglnd/mercury) is a minimal and human readable
-language for livecoding of algorithmic electronic music. Below is a link to steps for
-connecting Flok to either the Mercury Playground (browser based) or the Max8 version
-of the livecoding environment:
+[Mercury](https://mercury-playground.pages.dev/) is a free/open-source, beginner-friendly, minimal and human-readable language for the live coding of algorithmic electronic music. Just use the `mercury-web` target to start the Mercury engine immediately in the browser. Start typing some code and pres `Ctrl/Alt + Enter` to play the sound! 🎵 (and `Ctrl/Alt + .` to silence)
 
-[Follow the step-by-step guide here](https://tmhglnd.github.io/mercury/collaborate.html)
+##### Mercury REPL
+
+If you want to connect a local running version of Mercury you can use the `mercury` REPL target instead. Below is a link to steps for connecting Flok to either the [Mercury Playground](https://github.com/tmhglnd/mercury-playground) (browser based) or the [Mercury4Max](https://github.com/tmhglnd/mercury) version of the livecoding environment running locally:
+
+[Follow the step-by-step guide here](https://tmhglnd.github.io/mercury/docs/collaborate#flok--mercury4max)
 
 Bug reports are welcome in the issues. If the issue is more Mercury than Flok related please
 report [here](https://github.com/tmhglnd/mercury/issues/new)
