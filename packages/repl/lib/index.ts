@@ -5,6 +5,7 @@ import {
   CommandREPLContext,
 } from "./repl.js";
 import TidalREPL from "./repl/tidal.js";
+import ZwirnREPL from "./repl/zwirn.js";
 import SclangREPL, { RemoteSclangREPL } from "./repl/sclang.js";
 import FoxDotREPL from "./repl/foxdot.js";
 import RenardoREPL from "./repl/renardo.js";
@@ -24,7 +25,8 @@ const replClasses = {
   renardo: RenardoREPL,
   mercury: MercuryREPL,
   sardine: SardineREPL,
-  dummy: DummyREPL
+  zwirn: ZwirnREPL,
+  dummy: DummyREPL,
 };
 
 function createREPLFor(repl: string, ctx: CommandREPLContext) {
