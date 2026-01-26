@@ -21,6 +21,7 @@ import {
 import { evalKeymap, flashField, remoteEvalFlash } from "@flok-editor/cm-eval";
 import { punctual } from "@flok-editor/lang-punctual";
 import { tidal } from "@flok-editor/lang-tidal";
+import { zwirn } from "@flok-editor/lang-zwirn";
 import type { Document } from "@flok-editor/session";
 import { vim } from "@replit/codemirror-vim";
 import { highlightExtension } from "@strudel/codemirror";
@@ -38,6 +39,7 @@ const langExtensionsByLanguage: { [lang: string]: any } = {
   javascript: javascript,
   python: python,
   tidal: tidal,
+  zwirn: zwirn,
   punctual: punctual,
 };
 const panicCodes = panicCodesUntyped as { [target: string]: string };
