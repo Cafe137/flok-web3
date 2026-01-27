@@ -1,6 +1,6 @@
 {
   "name": "@flok-editor/pubsub",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Pub/Sub client-server, used for remote code execution and message passing on Flok",
   "author": "Damián Silvani <munshkr@gmail.com>",
   "license": "GPL-3.0+",

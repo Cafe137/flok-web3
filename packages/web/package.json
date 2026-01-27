@@ -1,6 +1,6 @@
 {
   "name": "flok-web",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Web server for Flok",
   "author": "Damián Silvani <munshkr@gmail.com>",
   "license": "GPL-3.0+",
@@ -24,7 +24,7 @@
     "format": "prettier -w ."
   },
   "dependencies": {
-    "@flok-editor/server-middleware": "^1.3.0",
+    "@flok-editor/server-middleware": "^1.3.1",
     "@strudel/draw": "^1.2.5",
     "@uiw/codemirror-theme-andromeda": "^4.22.1",
     "@uiw/codemirror-theme-bespin": "^4.22.1",
@@ -43,11 +43,11 @@
     "@codemirror/lang-python": "^6.1.3",
     "@codemirror/state": "^6.4.0",
     "@codemirror/view": "^6.23.0",
-    "@flok-editor/cm-eval": "^1.3.0",
-    "@flok-editor/lang-punctual": "^1.3.0",
-    "@flok-editor/lang-tidal": "^1.3.0",
-    "@flok-editor/lang-zwirn": "^0.1.0",
-    "@flok-editor/session": "^1.3.0",
+    "@flok-editor/cm-eval": "^1.3.1",
+    "@flok-editor/lang-punctual": "^1.3.1",
+    "@flok-editor/lang-tidal": "^1.3.1",
+    "@flok-editor/lang-zwirn": "^1.3.1",
+    "@flok-editor/session": "^1.3.1",
     "@radix-ui/react-dialog": "^1.1.4",
     "@radix-ui/react-dropdown-menu": "^2.1.4",
     "@radix-ui/react-label": "^2.1.1",
