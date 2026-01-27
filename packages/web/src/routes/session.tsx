@@ -562,6 +562,7 @@ export function Component() {
   }, []);
 
   const bgOpacity = query.get("bgOpacity") || "1.0";
+  const hideCode = !!query.get("hideCode");
 
   const activeWebTargets = useMemo(
     () =>
@@ -599,7 +600,10 @@ export function Component() {
   };
 
   return (
-    <div style={{ backgroundColor: `rgb(0 0 0 / ${bgOpacity})` }}>
+    <div
+      style={{ backgroundColor: `rgb(0 0 0 / ${bgOpacity})` }}
+      className="min-h-screen"
+    >
       <Helmet>
         <title>{name} ~ Flok</title>
       </Helmet>
@@ -664,30 +668,32 @@ export function Component() {
           onOpenChange={(isOpen) => setReplsDialogOpen(isOpen)}
         />
       )}
-      <Mosaic
-        className={cn(
-          "transition-opacity",
-          hidden ? "opacity-0" : "opacity-100",
-        )}
-        currentPaneIndex={currentPaneIndex}
-        items={documents.map((doc, i) => (
-          <Pane
-            key={doc.id}
-            document={doc}
-            onTargetChange={handleTargetSelectChange}
-            onEvaluateButtonClick={handleEvaluateButtonClick}
-            onCommandsButtonClick={() => setCommandsDialogOpen(true)}
-          >
-            <Editor
-              ref={editorRefs[i]}
+      {!hideCode && (
+        <Mosaic
+          className={cn(
+            "transition-opacity",
+            hidden ? "opacity-0" : "opacity-100",
+          )}
+          currentPaneIndex={currentPaneIndex}
+          items={documents.map((doc, i) => (
+            <Pane
+              key={doc.id}
               document={doc}
-              autoFocus={i === 0}
-              settings={editorSettings}
-              className="absolute top-6 overflow-auto flex-grow w-full h-[calc(100%-32px)] z-10"
-            />
-          </Pane>
-        ))}
-      />
+              onTargetChange={handleTargetSelectChange}
+              onEvaluateButtonClick={handleEvaluateButtonClick}
+              onCommandsButtonClick={() => setCommandsDialogOpen(true)}
+            >
+              <Editor
+                ref={editorRefs[i]}
+                document={doc}
+                autoFocus={i === 0}
+                settings={editorSettings}
+                className="absolute top-6 overflow-auto flex-grow w-full h-[calc(100%-32px)] z-10"
+              />
+            </Pane>
+          ))}
+        />
+      )}
       {activeWebTargets.map((target) => (
         <WebTargetIframe
           key={target}
@@ -696,7 +702,7 @@ export function Component() {
           displaySettings={displaySettings}
         />
       ))}
-      {!isMobile && (
+      {!isMobile && !hideCode && (
         <div
           className={cn(
             "fixed top-1 right-1 flex m-1",
@@ -710,7 +716,7 @@ export function Component() {
           <CommandsButton onClick={() => setCommandsDialogOpen(true)} />
         </div>
       )}
-      {messagesPanelExpanded && (
+      {messagesPanelExpanded && !hideCode && (
         <MessagesPanel
           className={cn(
             "transition-opacity",
@@ -724,23 +730,25 @@ export function Component() {
           onClearMessagesClick={handleClearMessagesClick}
         />
       )}
-      <StatusBar
-        className={cn(
-          "transition-opacity",
-          hidden ? "opacity-0" : "opacity-100",
-        )}
-        pubSubState={pubSubState}
-        syncState={syncState}
-        messagesCount={messagesPanelExpanded ? 0 : messagesCount}
-        onExpandClick={() => {
-          setMessagesPanelExpanded((v) => !v);
-        }}
-        currentPaneIndex={currentPaneIndex}
-        totalPanes={documents.length}
-        onNextPane={handleNextPane}
-        onPreviousPane={handlePreviousPane}
-        keyboardHeight={keyboardHeight}
-      />
+      {!hideCode && (
+        <StatusBar
+          className={cn(
+            "transition-opacity",
+            hidden ? "opacity-0" : "opacity-100",
+          )}
+          pubSubState={pubSubState}
+          syncState={syncState}
+          messagesCount={messagesPanelExpanded ? 0 : messagesCount}
+          onExpandClick={() => {
+            setMessagesPanelExpanded((v) => !v);
+          }}
+          currentPaneIndex={currentPaneIndex}
+          totalPanes={documents.length}
+          onNextPane={handleNextPane}
+          onPreviousPane={handlePreviousPane}
+          keyboardHeight={keyboardHeight}
+        />
+      )}
       <Toaster />
     </div>
   );

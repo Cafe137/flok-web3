@@ -497,6 +497,7 @@ packages:
   Options: `*`, `[webTarget]`. Eg: `?noWebEval=hydra` disables only Hydra.
   `?noWebEval=*` disables all web targets.
 - `hideErrors` (boolean): Do not show errors for web targets (hydra, strudel, etc)
+- `hideCode` (boolean): Do not show text editors
 
 ### Window messages
 
