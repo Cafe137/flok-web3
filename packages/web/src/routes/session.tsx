@@ -10,6 +10,7 @@ import { ReplsButton } from "@/components/repls-button";
 import { ReplsDialog } from "@/components/repls-dialog";
 import SessionCommandDialog from "@/components/session-command-dialog";
 import { ShareUrlDialog } from "@/components/share-url-dialog";
+import { ImportSwarmDialog } from "@/components/import-swarm-dialog";
 import { PubSubState, StatusBar, SyncState } from "@/components/status-bar";
 import { Toaster } from "@/components/ui/toaster";
 import UsernameDialog from "@/components/username-dialog";
@@ -29,7 +30,9 @@ import {
   code2hash,
   generateRandomUserName,
   hash2code,
+  importFromSwarm,
   mod,
+  shareToSwarm,
   store,
 } from "@/lib/utils";
 import {
@@ -109,6 +112,10 @@ export function Component() {
   const [configureDialogOpen, setConfigureDialogOpen] = useState(false);
   const [displaySettingsDialogOpen, setDisplaySettingsDialogOpen] =
     useState(false);
+  const [importSwarmDialogOpen, setImportSwarmDialogOpen] = useState(false);
+  const [importSwarmTarget, setImportSwarmTarget] = useState<Document | null>(
+    null,
+  );
   const [documents, setDocuments] = useState<Document[]>([]);
   const [hidden, setHidden] = useState<boolean>(false);
 
@@ -533,6 +540,87 @@ export function Component() {
     document.evaluate(document.content, { from: null, to: null });
   };
 
+  const handleShareToSwarm = async (document: Document) => {
+    try {
+      const url = await shareToSwarm(document.content);
+      await navigator.clipboard.writeText(url);
+      toast({
+        title: "Shared to Swarm",
+        description: `Link copied to clipboard: ${url}`,
+      });
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        title: "Share to Swarm failed",
+        description: `${err}`,
+      });
+    }
+  };
+
+  // Picking a pane in the command palette opens the import dialog; the actual
+  // fetch happens once the user submits a hash/URL there.
+  const handleImportFromSwarm = (document: Document) => {
+    setImportSwarmTarget(document);
+    setImportSwarmDialogOpen(true);
+  };
+
+  const handleImportSwarmAccept = async (input: string) => {
+    const target = importSwarmTarget;
+    if (!target) return;
+    try {
+      const code = await importFromSwarm(input);
+      target.content = code;
+      target.evaluate(code, { from: null, to: null });
+      toast({
+        title: "Imported from Swarm",
+        description: "Code loaded into the selected pane.",
+      });
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        title: "Import from Swarm failed",
+        description: `${err}`,
+      });
+    }
+  };
+
+  const handleSubmitSample = () => {
+    window.open(`${import.meta.env.BASE_URL}submit.html`, "_blank");
+  };
+
+  // Auto-import code from Swarm when the session is opened with `?import=<hash>`.
+  // Loads into the first pane, then strips the param from the URL.
+  const swarmImportedRef = useRef(false);
+  useEffect(() => {
+    if (swarmImportedRef.current) return;
+    const importHash = query.get("import");
+    if (!importHash || documents.length === 0) return;
+
+    swarmImportedRef.current = true;
+    const target = documents[0];
+    (async () => {
+      try {
+        const code = await importFromSwarm(importHash);
+        target.content = code;
+        target.evaluate(code, { from: null, to: null });
+        toast({
+          title: "Imported from Swarm",
+          description: "Code loaded into pane 1.",
+        });
+      } catch (err) {
+        toast({
+          variant: "destructive",
+          title: "Import from Swarm failed",
+          description: `${err}`,
+        });
+      }
+    })();
+
+    const url = new URL(window.location.href);
+    url.searchParams.delete("import");
+    window.history.replaceState(null, "", url.toString());
+  }, [documents, query, toast]);
+
   const handleConfigureAccept = (targets: string[]) => {
     if (!session) return;
     setActiveDocuments(session, targets);
@@ -619,6 +707,10 @@ export function Component() {
         onDisplaySettingsChange={setDisplaySettings}
         onSessionNew={() => navigate("/")}
         onSessionShareUrl={() => setShareUrlDialogOpen(true)}
+        documents={documents}
+        onShareToSwarm={handleShareToSwarm}
+        onImportFromSwarm={handleImportFromSwarm}
+        onSubmitSample={handleSubmitSample}
         onLayoutAdd={handleViewLayoutAdd}
         onLayoutRemove={handleViewLayoutRemove}
         onLayoutConfigure={() => setConfigureDialogOpen(true)}
@@ -638,6 +730,11 @@ export function Component() {
         url={sessionUrl}
         open={shareUrlDialogOpen}
         onOpenChange={(isOpen) => setShareUrlDialogOpen(isOpen)}
+      />
+      <ImportSwarmDialog
+        open={importSwarmDialogOpen}
+        onOpenChange={(isOpen) => setImportSwarmDialogOpen(isOpen)}
+        onAccept={handleImportSwarmAccept}
       />
       {session && (
         <ConfigureDialog

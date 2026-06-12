@@ -207,11 +207,14 @@ async function loadSamples() {
   const ds = "https://strudel.b-cdn.net";
   const result = await Promise.all([
     samples(`${ds}/tidal-drum-machines.json`),
-    samples(`${ds}/piano.json`),
-    samples(`${ds}/Dirt-Samples.json`),
-    samples(`${ds}/EmuSP12.json`),
-    samples(`${ds}/vcsl.json`),
     samples(`${ds}/mridangam.json`),
+    // Kept so the `Pattern.prototype.piano` helper below still resolves its
+    // "piano" sample set.
+    samples(`${ds}/piano.json`),
+    // Curated / user-submitted samples published to Swarm and resolved via the
+    // livecoding.eth ENS name. This replaces the bundled Dirt-Samples / EmuSP12
+    // / VCSL sample banks.
+    samples("https://samples.livecoding.eth.limo"),
   ]);
   aliasBank("/assets/tidal-drum-machines-alias.json");
   return result;

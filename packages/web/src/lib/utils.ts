@@ -76,6 +76,41 @@ export function hash2code(hash: string) {
   return base64ToUnicode(decodeURIComponent(hash));
 }
 
+// Swarm (decentralized storage) sharing, via the bzz.limo gateway.
+const SWARM_GATEWAY = "https://bzz.limo";
+
+// Uploads `code` to Swarm and returns the immutable bzz.limo URL pointing at it.
+export async function shareToSwarm(code: string): Promise<string> {
+  const response = await fetch(`${SWARM_GATEWAY}/bzz`, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain" },
+    body: code,
+  });
+  if (!response.ok) {
+    throw new Error(`Upload failed: ${response.status}`);
+  }
+  const data = await response.json();
+  return `${SWARM_GATEWAY}/bzz/${data.reference}/`;
+}
+
+// Fetches code previously shared to Swarm. Accepts either a bare Swarm hash or
+// a full bzz.limo URL (e.g. https://bzz.limo/bzz/<hash>/).
+export async function importFromSwarm(input: string): Promise<string> {
+  let hash = input.trim();
+  const match = hash.match(/bzz\/([a-fA-F0-9]+)/);
+  if (match) {
+    hash = match[1];
+  }
+  const response = await fetch(`${SWARM_GATEWAY}/bzz/${hash}/`);
+  if (!response.headers.get('Content-Type')?.startsWith('text/')) {
+    throw new Error("You can only import text");
+  }
+  if (!response.ok) {
+    throw new Error(`Fetch failed: ${response.status}`);
+  }
+  return response.text();
+}
+
 export function sendToast(
   variant: "warning" | "destructive",
   title: string,

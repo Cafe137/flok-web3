@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Sample</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 32px 16px;
+      font-family: system-ui, sans-serif;
+      font-size: 14px;
+      background: #111;
+      color: #e5e5e5;
+      display: flex;
+      justify-content: center;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 420px;
+    }
+
+    h1 {
+      font-size: 15px;
+      font-weight: 600;
+      margin: 0 0 14px;
+    }
+
+    label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .field {
+      margin-bottom: 12px;
+    }
+
+    input[type="file"],
+    input[type="text"] {
+      display: block;
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid #333;
+      border-radius: 4px;
+      font-size: 14px;
+      font-family: inherit;
+      background: #1e1e1e;
+      color: #e5e5e5;
+    }
+
+    input[type="text"]:focus,
+    input[type="file"]:focus {
+      outline: 2px solid #F47A20;
+      outline-offset: 1px;
+      border-color: transparent;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: #888;
+      margin-top: 3px;
+    }
+
+    button {
+      display: block;
+      width: 100%;
+      padding: 8px;
+      background: #F47A20;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background: #7a3d10;
+      color: #c9885c;
+      cursor: not-allowed;
+    }
+
+    #status {
+      margin-top: 12px;
+      font-size: 13px;
+      min-height: 18px;
+    }
+
+    #status.progress { color: #aaa; }
+    #status.error    { color: #f87171; }
+    #status.success  { color: #4ade80; }
+
+    #status a {
+      color: inherit;
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+  <h1>Upload Sample</h1>
+
+  <form id="form">
+    <div class="field">
+      <label for="file">Audio file</label>
+      <input type="file" id="file" accept=".wav,.mp3,.ogg" required>
+    </div>
+    <div class="field">
+      <label for="name">Sample name</label>
+      <input type="text" id="name" maxlength="32" required placeholder="e.g. kick">
+      <div class="hint">Lowercase letters, digits, and hyphens only — max 32 characters</div>
+    </div>
+    <button type="submit" id="submit">Upload</button>
+  </form>
+
+  <div id="status"></div>
+</div>
+
+  <script>
+    const ZERO_BATCH = '0'.repeat(64);
+    const BZZ = 'https://bzz.limo/bzz';
+    const OUTBOX = 'https://outbox.wtf/notify';
+
+    const form = document.getElementById('form');
+    const fileInput = document.getElementById('file');
+    const nameInput = document.getElementById('name');
+    const submitBtn = document.getElementById('submit');
+    const statusEl = document.getElementById('status');
+
+    const CONTENT_TYPES = { wav: 'audio/wav', mp3: 'audio/mpeg', ogg: 'audio/ogg' };
+
+    function setStatus(state, html) {
+      statusEl.className = state;
+      statusEl.innerHTML = html;
+    }
+
+    function setDisabled(disabled) {
+      submitBtn.disabled = disabled;
+      fileInput.disabled = disabled;
+      nameInput.disabled = disabled;
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const file = fileInput.files[0];
+      const sampleName = nameInput.value.trim();
+
+      const ext = file.name.split('.').pop().toLowerCase();
+      if (!CONTENT_TYPES[ext]) {
+        setStatus('error', 'Only .wav, .mp3, and .ogg files are supported.');
+        return;
+      }
+
+      if (!/^[a-z0-9-]+$/.test(sampleName)) {
+        setStatus('error', 'Sample name must be lowercase letters, digits, or hyphens only.');
+        return;
+      }
+
+      setDisabled(true);
+
+      // Step 1 — upload audio to Swarm
+      setStatus('progress', 'Uploading audio to Swarm…');
+      let filePayloadHash;
+      try {
+        const audioBytes = await file.arrayBuffer();
+        const res = await fetch(BZZ, {
+          method: 'POST',
+          headers: {
+            'Content-Type': CONTENT_TYPES[ext],
+            'Content-Disposition': `inline; filename="${file.name}"`,
+            'Swarm-Postage-Batch-Id': ZERO_BATCH,
+          },
+          body: audioBytes,
+        });
+        if (!res.ok) {
+          setStatus('error', `Audio upload failed (HTTP ${res.status}). Please try again.`);
+          setDisabled(false);
+          return;
+        }
+        ({ reference: filePayloadHash } = await res.json());
+      } catch {
+        setStatus('error', 'Audio upload failed. Please try again.');
+        setDisabled(false);
+        return;
+      }
+
+      // Step 2 — upload AddSampleEvent JSON to Swarm
+      setStatus('progress', 'Uploading event to Swarm…');
+      let eventHash;
+      try {
+        const event = {
+          type: 'add_sample',
+          signature: 'unsigned',
+          sampleName,
+          filename: file.name,
+          filePayloadHash,
+        };
+        const res = await fetch(BZZ, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Swarm-Postage-Batch-Id': ZERO_BATCH,
+          },
+          body: JSON.stringify(event),
+        });
+        if (!res.ok) {
+          setStatus('error', `Event upload failed (HTTP ${res.status}). Please try again.`);
+          setDisabled(false);
+          return;
+        }
+        ({ reference: eventHash } = await res.json());
+      } catch {
+        setStatus('error', 'Event upload failed. Please try again.');
+        setDisabled(false);
+        return;
+      }
+
+      // Step 3 — broadcast on-chain via notify-pro-bono
+      setStatus('progress', 'Broadcasting on-chain… (this may take ~10 s)');
+      try {
+        const res = await fetch(OUTBOX, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ data: eventHash }),
+        });
+
+        if (res.status === 429) {
+          setStatus('error', 'Too many submissions right now. Please wait a minute and try again.');
+          setDisabled(false);
+          return;
+        }
+
+        if (res.status >= 400 && res.status < 500) {
+          let msg = '';
+          try { ({ message: msg } = await res.json()); } catch { /* ignore */ }
+          setStatus('error', `Submission rejected${msg ? ': ' + msg : '.'}`);
+          setDisabled(false);
+          return;
+        }
+
+        if (!res.ok) {
+          setStatus('error', 'Broadcast failed. Please try again.');
+          setDisabled(false);
+          return;
+        }
+
+        const { hash } = await res.json();
+        setStatus('success',
+          `Sample uploaded! Transaction: <a href="https://gnosisscan.io/tx/${hash}" target="_blank" rel="noopener">${hash}</a><br>` +
+          `You can close this window. Wait about a minute, then press Play or Update in Strudel to see your new sample appear in the list.`
+        );
+        form.reset();
+        setDisabled(false);
+      } catch {
+        setStatus('error', 'Broadcast failed. Please try again.');
+        setDisabled(false);
+        return;
+      }
+    });
+  </script>
+</body>
+</html>

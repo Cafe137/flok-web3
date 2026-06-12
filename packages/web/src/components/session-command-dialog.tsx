@@ -16,11 +16,14 @@ import { DisplaySettings } from "@/lib/display-settings";
 import fonts, { loadFont } from "@/lib/fonts";
 import themes from "@/lib/themes";
 import { changeLogUrl, repoUrl } from "@/settings.json";
+import { type Document } from "@flok-editor/session";
 import {
   ArrowLeft,
+  Download,
   Edit2,
   FileDigit,
   FilePlus,
+  FlaskConical,
   FolderGit2,
   Minus,
   Monitor,
@@ -30,6 +33,7 @@ import {
   Share,
   TextCursorIcon,
   Type,
+  Upload,
   WrapText,
 } from "lucide-react";
 import { useState } from "react";
@@ -44,6 +48,10 @@ interface SessionCommandDialogProps extends CommandDialogProps {
   onSessionChangeUsername: () => void;
   onSessionNew: () => void;
   onSessionShareUrl: () => void;
+  documents: Document[];
+  onShareToSwarm: (document: Document) => void;
+  onImportFromSwarm: (document: Document) => void;
+  onSubmitSample: () => void;
   onLayoutAdd: () => void;
   onLayoutRemove: () => void;
   onLayoutConfigure: () => void;
@@ -149,6 +157,21 @@ export default function SessionCommandDialog({
               <CommandItem onSelect={wrapHandler(props.onSessionShareUrl)}>
                 <Share className="mr-2 h-4 w-4" />
                 <span>Share URL</span>
+              </CommandItem>
+              <CommandItem onSelect={() => setPages([...pages, "shareSwarm"])}>
+                <Upload className="mr-2 h-4 w-4" />
+                <span>Share to Swarm</span>
+              </CommandItem>
+              <CommandItem onSelect={() => setPages([...pages, "importSwarm"])}>
+                <Download className="mr-2 h-4 w-4" />
+                <span>Import from Swarm</span>
+              </CommandItem>
+              <CommandItem onSelect={wrapHandler(props.onSubmitSample)}>
+                <FlaskConical
+                  className="mr-2 h-4 w-4"
+                  style={{ color: "#F47A20" }}
+                />
+                <span style={{ color: "#F47A20" }}>Submit Sample</span>
               </CommandItem>
               {/* <CommandItem>
                 <FolderOpen className="mr-2 h-4 w-4" />
@@ -306,6 +329,49 @@ export default function SessionCommandDialog({
                 <span className="capitalize">{name}</span>
               </CommandItem>
             ))}
+          </CommandGroup>
+        )}
+        {(page === "shareSwarm" || page === "importSwarm") && (
+          <CommandGroup
+            heading={
+              page === "shareSwarm"
+                ? "Share which pane to Swarm?"
+                : "Import from Swarm into which pane?"
+            }
+          >
+            <CommandItem onSelect={() => setPages([])} key="swarmPaneMenu">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              <span>Back to menu</span>
+            </CommandItem>
+            {props.documents.length === 0 ? (
+              <CommandItem disabled>
+                <span>No panes available</span>
+              </CommandItem>
+            ) : (
+              props.documents.map((document, i) => (
+                <CommandItem
+                  onSelect={() => {
+                    setPages([]);
+                    wrapHandlerWithValue(
+                      page === "shareSwarm"
+                        ? props.onShareToSwarm
+                        : props.onImportFromSwarm,
+                      document,
+                    )();
+                  }}
+                  key={document.id}
+                >
+                  {page === "shareSwarm" ? (
+                    <Upload className="mr-2 h-4 w-4" />
+                  ) : (
+                    <Download className="mr-2 h-4 w-4" />
+                  )}
+                  <span>
+                    Pane {i + 1} — <b>{document.target}</b>
+                  </span>
+                </CommandItem>
+              ))
+            )}
           </CommandGroup>
         )}
       </CommandList>
