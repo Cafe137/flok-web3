@@ -92,6 +92,35 @@ export function Component() {
   const query = useQuery();
   const [hash, setHash] = useHash();
 
+  // Persist ?server= param to localStorage and strip it from the URL.
+  // Supports two placements:
+  //   inside the hash:  /#/s/name?server=https://...  (preferred — no Swarm 404)
+  //   real query string: /?server=https://...#/s/name  (fallback)
+  useEffect(() => {
+    const inHash = query.get("server");
+    const inSearch = new URLSearchParams(window.location.search).get("server");
+    const serverParam = inHash || inSearch;
+    if (!serverParam) return;
+    store.set("flok:server", serverParam);
+
+    if (inHash) {
+      const params = new URLSearchParams(query);
+      params.delete("server");
+      navigate({ search: params.toString() }, { replace: true });
+    } else {
+      const realParams = new URLSearchParams(window.location.search);
+      realParams.delete("server");
+      const newSearch = realParams.toString();
+      window.history.replaceState(
+        null,
+        "",
+        window.location.pathname +
+          (newSearch ? `?${newSearch}` : "") +
+          window.location.hash,
+      );
+    }
+  }, []);
+
   const [currentPaneIndex, setCurrentPaneIndex] = useState(0);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
 
@@ -202,8 +231,15 @@ export function Component() {
   useEffect(() => {
     if (!name) return;
 
-    const { hostname, port, protocol } = window.location;
-    const isSecure = protocol === "https:";
+    const storedServer = store.get("flok:server");
+    const serverOrigin = storedServer ? new URL(storedServer) : null;
+    const hostname = serverOrigin
+      ? serverOrigin.hostname
+      : window.location.hostname;
+    const port = serverOrigin ? serverOrigin.port : window.location.port;
+    const isSecure = serverOrigin
+      ? serverOrigin.protocol === "https:"
+      : window.location.protocol === "https:";
     const newSession = new Session(name, {
       hostname,
       port: parseInt(port),
@@ -408,9 +444,10 @@ export function Component() {
     };
 
     const hashString = new URLSearchParams(hash).toString();
-    const currentURL = window.location.href;
-
-    setSessionUrl(`${currentURL}#${hashString}`);
+    // With hash routing the fragment is already the route path; append as search params
+    const hashPath = window.location.hash.split("?")[0];
+    const base = window.location.origin + window.location.pathname;
+    setSessionUrl(`${base}${hashPath}?${hashString}`);
   }, [session, shareUrlDialogOpen]);
 
   // Handle window messages from iframes

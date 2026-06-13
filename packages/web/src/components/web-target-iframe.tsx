@@ -80,7 +80,7 @@ export const WebTargetIframe = ({
   return (
     <iframe
       ref={ref}
-      src={`/frames/${target}`}
+      src={`${import.meta.env.BASE_URL}#/frames/${target}`}
       className="absolute inset-0 w-full h-full"
     />
   );

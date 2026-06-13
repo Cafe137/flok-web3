@@ -1,47 +1,26 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
 
 type HashRecord = Record<string, string | null>;
+type HashUpdater = HashRecord | ((prev: HashRecord) => HashRecord);
 
-const fromObject = (obj: HashRecord) =>
-  Object.entries(obj)
-    .filter(([_, value]) => value != null)
-    .map(([key, value]) => `${key}=${encodeURIComponent(value!)}`)
-    .join("&");
+export function useHash(): [HashRecord, (newHash: HashUpdater) => void] {
+  const [searchParams, setSearchParams] = useSearchParams();
 
-const toObject = (hash: string) =>
-  hash
-    .slice(1)
-    .split("&")
-    .reduce((acc, curr) => {
-      const [key, value] = curr.split("=");
-      return { ...acc, [key]: decodeURIComponent(value) };
-    }, {});
-
-export function useHash(): [
-  HashRecord,
-  (newHash: HashRecord | React.SetStateAction<HashRecord>) => void,
-] {
-  const [hash, setHash] = useState<HashRecord>(() =>
-    toObject(window.location.hash),
-  );
-
-  const hashChangeHandler = useCallback(() => {
-    setHash(toObject(window.location.hash));
-  }, []);
-
-  useEffect(() => {
-    window.addEventListener("hashchange", hashChangeHandler);
-    return () => {
-      window.removeEventListener("hashchange", hashChangeHandler);
-    };
-  }, []);
+  const hash: HashRecord = Object.fromEntries(searchParams.entries());
 
   const updateHash = useCallback(
-    (newHash: HashRecord | React.SetStateAction<HashRecord>) => {
+    (newHash: HashUpdater) => {
       if (typeof newHash === "function") newHash = newHash(hash);
-      window.location.hash = fromObject(newHash);
+      const params = Object.fromEntries(
+        Object.entries(newHash).filter(([, v]) => v != null) as [
+          string,
+          string,
+        ][],
+      );
+      setSearchParams(params, { replace: true });
     },
-    [hash],
+    [hash, setSearchParams],
   );
 
   return [hash, updateHash];
